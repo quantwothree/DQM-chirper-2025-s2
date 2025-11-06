@@ -5,6 +5,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StaticPageController;
 use Illuminate\Support\Facades\Route;
+use \App\Http\Controllers\ChirpController;
+use App\Http\Controllers\Admin\UserManagementController;
 
 Route::get('/', [StaticPageController::class, 'home'])
     ->name('home');
@@ -21,7 +23,12 @@ Route::middleware(['auth', 'verified'])
         Route::get('/', [AdminController::class, 'index'])
             ->name('index');
 
-        Route::get('users', [AdminController::class, 'users'])->name('users');
+        Route::post('users/{user}/delete', [UserManagementController::class, 'delete'])
+            ->name('users.delete');
+
+        Route::resource('users',
+            UserManagementController::class);
+        //        Route::get('users', [UserManagementController::class, 'index'])->name('users');
     });
 
 Route::middleware('auth')->group(function () {
@@ -32,5 +39,30 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
 });
+
+//Create a GET for /chirps with index() in ChirpController
+//Create a POST for /chirps with index() in ChirpController
+
+/**
+ * Table of the HTTP VERBs, the ENDPOINT URIs,
+ * CONTROLLER ACTIONs and the ROUTEs
+ * interpreted when using route('ROUTE_NAME')
+ * in code.
+ *
+ * | Verb       |  URI                       |  Action   |  Route Name          |
+ * |------------|----------------------------|-----------|----------------------|
+ * | GET        |  /chirps                   |  index    |  chirps.index        |
+ * | POST       |  /chirps                   |  store    |  chirps.store        |
+ * | GET        |  /chirps/{chirp}/edit      |  edit     |  chirps.edit         |
+ * | PUT/PATCH  |  /chirps/{chirp}           |  update   |  chirps.update       |
+ * | DELETE     |  /chirps/{chirp}           |  destroy  |  chirps.destroy      |
+ */
+
+Route::resource('chirps', ChirpController::class)
+    ->only(['index', 'store', 'edit', 'update','destroy'])
+    ->middleware(['auth', 'verified']);
+
+
+
 
 require __DIR__.'/auth.php';
